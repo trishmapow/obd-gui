@@ -30,7 +30,7 @@ The Pi gets power from a USB socket on the CD player meant for flash disks (it a
 - Connect module to car
 - On the Pi, in a terminal, run:
     - `sudo apt update && sudo apt upgrade`
-    - `pip3 install obd PySimpleGUI`
+    - `pip3 install obd PySimpleGUI keyboard`
     - `git clone https://github.com/trishmapow/obd-gui`
 - To connect to the module, run:
     - `bluetoothctl` to enter bluetoothctl shell
