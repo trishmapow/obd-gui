@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Application
+Name=obd-gui
+Comment=OBD stats
+Exec=sudo sh /home/pi/connect.sh

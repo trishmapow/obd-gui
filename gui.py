@@ -1,13 +1,19 @@
+import sys
+# Ugly hack because script launches using sudo, pythonpath is broken
+# sys.path.append("/home/pi/.local/lib/python3.7/site-packages/")
+# sys.path.append("/home/pi/obd-gui/")
+
 import itertools
 import obd
 import PySimpleGUI as sg
 import random
 from utils import Buffer
 
-# Testing without bluetooth connection
-DEBUG_MOCK = True
+DEBUG_MOCK = False # Testing without bluetooth connection
+DEBUG_CONNECT = True # Show pythonOBD debug info
+UPDATE_FREQ = 2.5 # wait 1/freq s each frame
 
-FONT = "Arial 12"
+FONT = "Arial 20"
 BUFFER_SIZE = 60 # buffer & graph last x measurements
 GRAPH_Y_MAX = 100
 
@@ -18,13 +24,13 @@ history = {k: Buffer(maxlen=BUFFER_SIZE) for k in itertools.chain.from_iterable(
 labels = ("s1", "s2", "s3", "s4") # layout: sX_l for label, sX_d for data
 
 layout = [
-    [sg.Text("", size=(20, 1), key=f"{label}_l", font=FONT),
-     sg.Text("", size=(10, 1), key=f"{label}_d", font=FONT),
-     sg.Graph(canvas_size=(150, 75), graph_bottom_left=(-BUFFER_SIZE-1, -GRAPH_Y_MAX*1.05), graph_top_right=(1, GRAPH_Y_MAX*1.05),
-              background_color="white", key=f"{label}_g")]
+    [sg.Text("", size=(15, 1), key=f"{label}_l", font=FONT),
+     sg.Text("", size=(15, 1), key=f"{label}_d", font=FONT, justification='left'),
+     sg.Graph(canvas_size=(170, 120), graph_bottom_left=(-BUFFER_SIZE-1, -GRAPH_Y_MAX*1.05),
+              graph_top_right=(1, GRAPH_Y_MAX*1.05), background_color="white", key=f"{label}_g")]
     for label in labels
 ]
-layout.append([sg.Text("", size=(20, 1), key="page_num")])
+layout.append([sg.Text("", size=(20, 1), key="page_num", font="Arial 14")])
 
 def connect(port="/dev/rfcomm0", watchlist=None, debug=False):
     if debug:
@@ -45,7 +51,8 @@ def format_name(name):
 
 def main():
     window = sg.Window("Test", layout, return_keyboard_events=True).Finalize()
-    conn = connect(watchlist=list(itertools.chain.from_iterable(watchlist)), debug=True)
+    window.Maximize()
+    conn = connect(watchlist=list(itertools.chain.from_iterable(watchlist), debug=DEBUG_CONNECT))
 
     page = 0
     max_page = len(watchlist) - 1
@@ -65,17 +72,20 @@ def main():
 
         # show only current page on screen
         for label, item in zip(labels, watchlist[page]):
-            window[label + "_d"].update(history[item][0])
+            window[label + "_d"].update(str(history[item][0])[:15])
 
     def update_graphs():
         for label, item in zip(labels, watchlist[page]):
             label += "_g"
-            data = history[item]
+            data = [round(x.value.magnitude, 2) for x in history[item] if not x.is_null()]
+            if len(data) == 0: continue
+
             min_y, max_y = min(data), max(data)
             avg_y, range_y = (min_y + max_y) / 2, max_y - min_y
 
-            window[label].erase()
+            window[label].erase()   # clear previous draw
 
+            # get scale and offset to autoscale graph
             scale = GRAPH_Y_MAX*2 / (range_y if range_y != 0 else 1)
             offset = -avg_y * scale
 
@@ -94,7 +104,7 @@ def main():
 
     update_labels()
     while True:
-        event, values = window.read(timeout=500)
+        event, values = window.read(timeout=UPDATE_FREQ*100)
         if event is None:
             break
         
