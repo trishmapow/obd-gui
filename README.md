@@ -1,4 +1,4 @@
-# Raspberry Pi OBD + reverse camera dashboard
+# RPi OBD dashboard (+ reverse camera display)
 
 ![picture of display mounted on car](obd_display.jpg)
 (yes there are too many decimal places on the engine load, I've fixed this in the code)
@@ -51,6 +51,7 @@ The Pi gets power from a USB socket on the CD player meant for flash disks (it a
     - try pressing the first button, the relay should switch. The second and third buttons should emulate the left and right arrow keys respectively
 - Autostart the apps with the Pi:
     - copy the files in `autostart` to `/etc/xdg/autostart`. Make any necessary edits to the desktop files.
+    - add your module's MAC address in `connect.sh`
     - if the scripts complain about missing modules when running with sudo, uncomment the `sys.path.append` lines at the top of `gui.py` and `piface.py` (edit as necessary depending on your Python version, you can run `pip3 show obd` to see where your package is installed). This is a quick fix solution, there are cleaner ways if you edit sudoers, etc.
 
 ## Modifying the GUI
