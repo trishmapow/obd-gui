@@ -12,6 +12,7 @@ from utils import Buffer
 DEBUG_MOCK = False # Testing without bluetooth connection
 DEBUG_CONNECT = True # Show pythonOBD debug info
 UPDATE_FREQ = 2.5 # wait 1/freq s each frame
+PORT = "/dev/rfcomm0"
 
 FONT = "Arial 20"
 BUFFER_SIZE = 60 # buffer & graph last x measurements
@@ -32,7 +33,7 @@ layout = [
 ]
 layout.append([sg.Text("", size=(20, 1), key="page_num", font="Arial 14")])
 
-def connect(port="/dev/rfcomm0", watchlist=None, debug=False):
+def connect(port=PORT, watchlist=None, debug=False):
     if debug:
         obd.logger.setLevel(obd.logging.DEBUG)
     conn = obd.Async(port, fast=False)

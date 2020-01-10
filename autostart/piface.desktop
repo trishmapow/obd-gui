@@ -2,4 +2,4 @@
 Type=Application
 Name=piface-control
 Comment=Buttons on PiFace
-Exec=sudo python3 /home/pi/piface.py
+Exec=sudo python3 /home/pi/obd-gui/piface.py

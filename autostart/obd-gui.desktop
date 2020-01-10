@@ -2,4 +2,4 @@
 Type=Application
 Name=obd-gui
 Comment=OBD stats
-Exec=sudo sh /home/pi/connect.sh
+Exec=sudo sh /home/pi/obd-gui/connect.sh
