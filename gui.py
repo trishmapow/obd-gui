@@ -53,7 +53,7 @@ def format_name(name):
 def main():
     window = sg.Window("Test", layout, return_keyboard_events=True).Finalize()
     window.Maximize()
-    conn = connect(watchlist=list(itertools.chain.from_iterable(watchlist), debug=DEBUG_CONNECT))
+    conn = connect(watchlist=list(itertools.chain.from_iterable(watchlist)), debug=DEBUG_CONNECT)
 
     page = 0
     max_page = len(watchlist) - 1
